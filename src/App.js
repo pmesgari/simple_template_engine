@@ -2,26 +2,40 @@ import { useState } from "react";
 import "./App.css";
 
 
-const Pair = function ({ data, parent, handleDataChange }) {
-  const handleKeyChange = function (p, u, t) {
-    console.log('key changed', p, u, t, data);
+const Pair = function ({ data, parent, handleDataChange, handleValueChange }) {
+  // const handleKeyChange = function (p, u, t) {
+  //   console.log('key changed', p, u, t, data);
 
-    const partials = Object.fromEntries(Object.entries(data[p]).filter(([k, v]) => k !== t));
-    const update = { [p]: { ...u, ...partials, } }
-    handleDataChange(parent, update, p)
+  //   const partials = Object.fromEntries(Object.entries(data[p]).filter(([k, v]) => k !== t));
+  //   const update = { [p]: { ...u, ...partials, } }
+  //   handleDataChange(parent, update, p)
 
+  // }
+
+  const handleKeyChange = function (previous, current) {
+    // 1. reconstruct
+    const partials = Object.fromEntries(
+      Object.entries(data).filter(([key, val]) => key !== previous)
+    );
+    const update = { [current]: data[previous] };
+    handleValueChange({ ...partials, ...update });
+    // 2. inform parent
   }
 
+  const handleValueChange = function () {
+
+  }
 
 
   return (
     <ul>
       {Object.entries(data).map(([key, value], index) =>
         <li key={index}>
-          <input type="text" value={key} onChange={(e) => handleDataChange(parent, { [e.target.value]: value }, key)} />
+          {/* Base Case */}
+          <input type="text" value={key} onChange={(e) => handleKeyChange(previous, current)} />
           {typeof value === 'string' ?
             <input type="text" value={value} onChange={(e) => console.log(e)} /> :
-            <Pair data={value} parent={key} handleDataChange={(p, u, t) => handleKeyChange(p, u, t)} />
+            <Pair data={value} parent={key} handleValueChange={(payload) => handleValueChange(key, payload)} handleDataChange={(p, u, t) => handleKeyChange(p, u, t)} />
           }
         </li>
       )}
